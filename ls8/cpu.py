@@ -15,6 +15,7 @@ POP = 0b01000110
 CMP = 0b10100111
 JMP = 0b01010100
 JEQ = 0b01010101
+JNQ = 0b01010110
 
 
 class CPU:
@@ -166,6 +167,10 @@ class CPU:
                 direct_pc_set = True
             elif ir == JEQ:
                 if self.fl == 1:
+                    self.pc = self.reg[operand_a]
+                    direct_pc_set = True
+            elif ir == JNQ:
+                if self.fl != 1:
                     self.pc = self.reg[operand_a]
                     direct_pc_set = True
             else:
