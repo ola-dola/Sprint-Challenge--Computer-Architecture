@@ -13,6 +13,7 @@ DIV = 0b10100011
 PUSH = 0b01000101
 POP = 0b01000110
 CMP = 0b10100111
+JMP = 0b01010100
 
 
 class CPU:
@@ -105,7 +106,7 @@ class CPU:
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
             self.pc,
-            # self.fl,
+            self.fl,
             # self.ie,
             self.ram_read(self.pc),
             self.ram_read(self.pc + 1),
@@ -126,6 +127,7 @@ class CPU:
             operand_b = self.ram_read(self.pc+2)
 
             instruction_length = (ir >> 6) + 1
+            direct_pc_set = False
 
             if ir == LDI:
                 self.reg[operand_a] = operand_b
@@ -149,7 +151,6 @@ class CPU:
                 self.reg[self.sp] -= 1   # decrement whats in R7 by 1
                 # place the `val` in memory, at the sp address
                 self.ram[self.reg[self.sp]] = val
-
             elif ir == POP:
                 """
                 Place the value in top of stack into given register address
@@ -159,8 +160,11 @@ class CPU:
                 self.reg[operand_a] = val
 
                 self.reg[self.sp] += 1
-
+            elif ir == JMP:
+                self.pc = self.reg[operand_a]
+                direct_pc_set = True
             else:
                 print("I do not understand that command")
 
-            self.pc += instruction_length
+            if direct_pc_set is False:
+                self.pc += instruction_length
