@@ -12,6 +12,7 @@ SUB = 0b10100001
 DIV = 0b10100011
 PUSH = 0b01000101
 POP = 0b01000110
+CMP = 0b10100111
 
 
 class CPU:
@@ -25,6 +26,7 @@ class CPU:
         self.running = False
         self.sp = 7             # R7, from specs
         self.reg[self.sp] = 244     # F4, from specs
+        self.fl = 0b00000000
 
     def ram_read(self, mem_address):
         """
@@ -85,6 +87,13 @@ class CPU:
         elif op == "DIV":
             # Floor division because we don't want to store floats. Headick!
             self.reg[reg_a] //= self.reg[reg_b]
+        elif op == "CMP":
+            if reg_a == reg_b:
+                self.fl = 0b00000001
+            elif reg_a < reg_b:
+                self.fl = 0b00000100
+            else:
+                self.fl = 0b00000010
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -130,6 +139,8 @@ class CPU:
                 self.alu("MUL", operand_a, operand_b)
             elif ir == SUB:
                 self.alu("SUB", operand_a, operand_b)
+            elif ir == CMP:
+                self.alu("CMP", operand_a, operand_b)
             elif ir == DIV:
                 self.alu("DIV", operand_a, operand_b)
             elif ir == PUSH:
