@@ -15,7 +15,7 @@ POP = 0b01000110
 CMP = 0b10100111
 JMP = 0b01010100
 JEQ = 0b01010101
-JNQ = 0b01010110
+JNE = 0b01010110
 
 
 class CPU:
@@ -91,9 +91,9 @@ class CPU:
             # Floor division because we don't want to store floats. Headick!
             self.reg[reg_a] //= self.reg[reg_b]
         elif op == "CMP":
-            if reg_a == reg_b:
+            if self.reg[reg_a] == self.reg[reg_b]:
                 self.fl = 0b00000001
-            elif reg_a < reg_b:
+            elif self.reg[reg_a] < self.reg[reg_b]:
                 self.fl = 0b00000100
             else:
                 self.fl = 0b00000010
@@ -106,7 +106,7 @@ class CPU:
         from run() if you need help debugging.
         """
 
-        print(f"TRACE: %02X | %02X %02X %02X |" % (
+        print(f"TRACE: %02X | %02X %02X %02X %02X |" % (
             self.pc,
             self.fl,
             # self.ie,
@@ -122,7 +122,6 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-
         while True:
             ir = self.ram[self.pc]
             operand_a = self.ram_read(self.pc+1)
@@ -169,7 +168,7 @@ class CPU:
                 if self.fl == 1:
                     self.pc = self.reg[operand_a]
                     direct_pc_set = True
-            elif ir == JNQ:
+            elif ir == JNE:
                 if self.fl != 1:
                     self.pc = self.reg[operand_a]
                     direct_pc_set = True
